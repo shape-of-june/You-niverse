@@ -63,16 +63,91 @@ exports.handler = async (event, context) => {
 
   try {
     // 3. Make the API Call to OpenAI
-    console.log(`Sending prompt to OpenAI: "${userPrompt}"`);
+    const systemPrompt = `
+    You are an AI assistant specialized in analyzing Korean text that describes a person's feelings or thoughts about an acquaintance. Your primary task is to identify the acquaintance being described and to estimate an adjustment value for 'friendliness' and 'importance' based on the sentiment and context of the input.
+
+    The input text will be one or more sentences in Korean.
+
+    Your output **MUST strictly be a JSON object** with the following structure and data types:
+
+    json
+    {
+      "object": "string",
+      "friendlinessAdjust": "string_representing_float",
+      "importanceAdjust": "string_representing_float"
+    }
+
+    Guidelines for Determining Values:
+
+    object: 
+    This field should contain the name or a clear descriptor of the acquaintance mentioned in the input text.
+
+    friendlinessAdjust:
+    This field represents the suggested adjustment to the level of friendliness or closeness with the acquaintance, based only on the provided text.
+    The value must be a string representing a floating-point number between "-1.0" and "1.0".
+    Positive values (e.g., "0.1" to "1.0") indicate an increase in desired friendliness or positive sentiment from the interaction described (e.g., had a good time, want to meet again).
+    Negative values (e.g., "-0.1" to "-1.0") indicate a decrease in desired friendliness or negative sentiment (e.g., a bad experience, desire to avoid).
+    A value of "0.0" indicates a neutral sentiment, no implied change in current friendliness from the text, or that the text doesn't provide enough information to suggest an adjustment.
+
+    importanceAdjust:
+    This field represents the suggested adjustment to the perceived importance or significance of the acquaintance in the user's thoughts, based only on the provided text.
+    The value must be a string representing a floating-point number between "-1.0" and "1.0".
+    Positive values (e.g., "0.1" to "1.0") indicate an increase in importance (e.g., remembering significant positive past contributions, a strong desire to reconnect or meet, the person is occupying more of the user's thoughts positively).
+    Negative values (e.g., "-0.1" to "-1.0") indicate a decrease in perceived positive importance or significance (e.g., a desire to diminish their role or significance in one's life due to negative interactions).
+    A value of "0.0" indicates a neutral stance on their importance, no change implied by the text, or that the text doesn't provide enough information.
+    Output ONLY the JSON object and nothing else. Do not include any explanatory text before or after the JSON.
+
+    Examples:
+
+    Input User Message: "나는 오늘 친구 윤서현을 만났는데, 정말 재밌게 놀았어. 다음에도 만나서 놀면 좋겠어"
+    Expected AI Output (JSON):
+
+    JSON
+
+    {
+      "object": "윤서현",
+      "friendlinessAdjust": "0.3",
+      "importanceAdjust": "0.05"
+    }
+    Input User Message: "나는 오늘 최윤진 선생님을 만나고 싶다는 생각을 했어. 내가 학생 때 나한테 정말 잘해줬었는데."
+    Expected AI Output (JSON):
+
+    JSON
+
+    {
+      "object": "최윤진 선생님",
+      "friendlinessAdjust": "0.0",
+      "importanceAdjust": "0.2"
+    }
+    Input User Message: "대학교 동기였던 김철수랑 오늘 우연히 마주쳤는데, 그냥 인사만 하고 지나갔다. 별 생각 없다."
+    Expected AI Output (JSON):
+
+    JSON
+
+    {
+      "object": "김철수",
+      "friendlinessAdjust": "0.0",
+      "importanceAdjust": "0.0"
+    }
+    Input User Message: "동생이 너무 시끄럽게 해서 스트레스 받아. 진짜 제발 정신 좀 차렸으면 좋겠다."
+    Expected AI Output (JSON):
+
+    JSON
+
+    {
+      "object": "동생",
+      "friendlinessAdjust": "-0.7",
+      "importanceAdjust": "-0.1"
+    }`; 
+
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Or your preferred model, e.g., "gpt-4"
+      model: "gpt-4o-mini", // Or your preferred model
+      response_format: { type: "json_object" }, // Request JSON mode if available and model supports
       messages: [
-        { role: "system", content: "You are a helpful assistant." }, // Optional: Define the AI's behavior
-        { role: "user", content: userPrompt }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPromptFromFrontend } // This is the user's sentence
       ],
-      // Optional parameters:
-      // max_tokens: 150, // Adjust as needed
-      // temperature: 0.7, // Adjust for creativity vs. determinism
+      // temperature: 0.3, // You might want a lower temperature for more deterministic JSON output
     });
 
     // 4. Process the Response

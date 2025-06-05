@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'planet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http; // <<< ADDED HTTP IMPORT
+import 'package:http/http.dart' as http;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,11 +50,6 @@ class _SolarSystemPageState extends State<SolarSystemPage>
   bool isLoading = true;
   bool _isSendingShout = false; // <<< ADDED for loading state
 
-  // Netlify Function URL - replace with your actual deployed function URL
-  // It will look like: https://your-netlify-site-name.netlify.app/.netlify/functions/chatWithGPT
-  // For local testing with `netlify dev`, it's often http://localhost:8888/.netlify/functions/chatWithGPT
-  // final String _netlifyFunctionUrl =
-      // "http://127.0.0.1:5500/.netlify/functions/getAdjustValue";
   final String _netlifyFunctionUrl =
       "https://subtle-kitsune-751533.netlify.app/.netlify/functions/getAdjustValue"; // <<< IMPORTANT: Use relative path for deployed app, or full for local testing if needed.
 
@@ -441,7 +436,7 @@ class _SolarSystemPageState extends State<SolarSystemPage>
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final String aiReply = data['reply'] ?? '응답을 받지 못했습니다.';
-        print('AI Reply: $aiReply'); // Log for debugging
+        print(aiReply);
 
         // Show success message with AI reply
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
