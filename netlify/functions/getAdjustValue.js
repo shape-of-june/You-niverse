@@ -151,51 +151,39 @@ exports.handler = async (event, context) => {
     });
 
     // 4. Process the Response
-    const chatGptResponse = completion.choices[0]?.message?.content?.trim();
+    const chatGptResponseContent = completion.choices[0]?.message?.content?.trim();
 
-    if (!chatGptResponse) {
-      console.error('No valid response content from OpenAI:', JSON.stringify(completion, null, 2));
+    if (chatGptResponseContent) {
+      try {
+        // The AI should be returning a JSON string, parse it into an object
+        const aiJsonObject = JSON.parse(chatGptResponseContent);
+    
+        // Now, this aiJsonObject is what your Flutter app expects
+        return {
+          statusCode: 200,
+          // Send this object directly as the response body (Netlify will stringify it)
+          // OR stringify it here explicitly.
+          body: JSON.stringify(aiJsonObject),
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8' // <<< CRUCIAL FOR ENCODING
+          }
+        };
+      } catch (e) {
+        console.error("Error parsing AI's JSON response in Netlify function:", e);
+        console.error("AI's raw response string that failed parsing:", chatGptResponseContent);
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: "Netlify function failed to parse AI's JSON response.", details: chatGptResponseContent }),
+          headers: { 'Content-Type': 'application/json; charset=utf-8' }
+        };
+      }
+    } else {
+      console.error('No valid response content from OpenAI in Netlify function.');
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to get a valid response from the AI service.' }),
+        body: JSON.stringify({ error: 'Failed to get a valid response from the AI service via Netlify function.' }),
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
       };
     }
-
-    // 5. Return the Response to the Frontend
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reply: chatGptResponse }),
-      headers: { 'Content-Type': 'application/json' },
-    };
-
-  } catch (error) {
-    console.error('Error calling OpenAI API:', error);
-    let errorMessage = 'An error occurred while communicating with the AI service.';
-    let errorDetails = null;
-
-    if (error.response) { // Axios-like error structure (OpenAI SDK might have this)
-      console.error('OpenAI API Error Status:', error.response.status);
-      console.error('OpenAI API Error Data:', error.response.data);
-      errorMessage = `AI service error: ${error.response.status}`;
-      errorDetails = error.response.data?.error?.message || 'No additional details from AI service.';
-    } else if (error.message) { // Generic error
-        errorMessage = error.message;
-    }
-
-    // For OpenAI SDK v4, errors are typically instances of OpenAI.APIError
-    if (error instanceof OpenAI.APIError) {
-        console.error('OpenAI APIError Status:', error.status); // e.g. 400
-        console.error('OpenAI APIError Message:', error.message); // e.g. Your request was rejected as a result of our safety system.
-        console.error('OpenAI APIError Code:', error.code); // e.g. content_policy_violation
-        console.error('OpenAI APIError Type:', error.type); // e.g. invalid_request_error
-        errorMessage = error.message || `AI service error: ${error.status}`;
-        errorDetails = `Type: ${error.type}, Code: ${error.code}`;
-    }
-
-
-    return {
-      statusCode: (error instanceof OpenAI.APIError ? error.status : null) || 500,
-      body: JSON.stringify({ error: errorMessage, details: errorDetails }),
-    };
   }
 };
