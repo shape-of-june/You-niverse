@@ -434,68 +434,72 @@ class _SolarSystemPageState extends State<SolarSystemPage>
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData;
+        // The http package usually decodes response.body as UTF-8 if the server sends
+        // 'Content-Type: ...; charset=utf-8'.
+        // If encoding issues persist even after fixing the Netlify function header,
+        // you might need to force decode:
+        // final String responseBody = utf8.decode(response.bodyBytes);
+        // final Map<String, dynamic> aiData = jsonDecode(responseBody);
+        // BUT try with response.body first, as it's simpler if headers are correct.
+
+        final Map<String, dynamic> aiData;
         try {
-          // Attempt to decode the response body, which should be the JSON from the Netlify function
-          responseData = jsonDecode(response.body);
+          // Assuming the Netlify function now returns the AI's JSON object directly as its body
+          aiData = jsonDecode(response.body) as Map<String, dynamic>;
         } catch (e) {
           print('Error decoding JSON from Netlify function: $e');
           print('Raw response body: ${response.body}');
           ScaffoldMessenger.of(scaffoldContext).showSnackBar(
             const SnackBar(
-              content: Text('AI로부터 받은 응답을 처리하는데 문제가 발생했습니다.'),
+              content: Text('AI로부터 받은 응답을 처리하는데 문제가 발생했습니다 (JSON 형식 오류).'),
               backgroundColor: Colors.redAccent,
             ),
           );
           return;
         }
 
-        // --- vvv THIS IS WHERE YOU PROCESS THE AI's JSON OBJECT vvv ---
-        // The 'reply' from your Netlify function should directly be the JSON object
-        // that ChatGPT produced.
-
-        // Assuming responseData is the direct JSON object like:
-        // { "object": "...", "friendlinessAdjust": "...", "importanceAdjust": "..." }
-
-        final String objectName = responseData['object'] ?? '';
+        final String objectNameFromAI =
+            aiData['object']?.toString() ?? ''; // Use toString() for safety
         final String friendlinessAdjustStr =
-            responseData['friendlinessAdjust'] ?? '0.0';
+            aiData['friendlinessAdjust']?.toString() ?? '0.0';
         final String importanceAdjustStr =
-            responseData['importanceAdjust'] ?? '0.0';
+            aiData['importanceAdjust']?.toString() ?? '0.0';
 
-        // Convert string adjustments to double
-        final double friendlinessAdjustment =
-            double.tryParse(friendlinessAdjustStr) ?? 0.0;
-        final double importanceAdjustment =
-            double.tryParse(importanceAdjustStr) ?? 0.0;
+        // Log the decoded name to check if encoding is fixed
+        print('Decoded AI Object Name: $objectNameFromAI');
+        print('AI Full Response Data: $aiData');
 
-        // Find the planet
-        // You might need to handle the encoding issue for 'objectName' separately
-        // For now, assuming objectName can be matched if encoding is fixed.
-        // If objectName is garbled like "ì´ìž¬ëª…", direct comparison will fail.
-        // You'd need to ensure your Netlify function returns UTF-8 correctly
-        // and that Flutter decodes it as UTF-8. `jsonDecode` usually handles UTF-8.
-        // The issue "ì´ìž¬ëª…" for "이재명" is a classic UTF-8 displayed as Latin-1 or similar.
-        // This needs to be fixed at the source (Netlify function headers/encoding) or how response.body is handled.
-        // For now, the logic below assumes 'objectName' can be correctly compared.
-
-        int planetIndex = planets.indexWhere((p) => p.name == objectName);
-
-        if (planetIndex == -1) {
-          print('행성 "$objectName"을(를) 찾을 수 없습니다. (AI 응답: $responseData)');
+        if (objectNameFromAI.isEmpty) {
+          print('AI did not specify an object name. AI Response: $aiData');
           ScaffoldMessenger.of(scaffoldContext).showSnackBar(
             SnackBar(
-              content: Text('AI가 언급한 "$objectName" 행성을 찾을 수 없습니다.'),
+              content: Text('AI가 행성 이름을 명확히 응답하지 않았습니다.'),
               backgroundColor: Colors.orangeAccent,
             ),
           );
           return;
         }
 
-        // Get the planet
+        final double friendlinessAdjustment =
+            double.tryParse(friendlinessAdjustStr) ?? 0.0;
+        final double importanceAdjustment =
+            double.tryParse(importanceAdjustStr) ?? 0.0;
+
+        int planetIndex = planets.indexWhere((p) => p.name == objectNameFromAI);
+
+        if (planetIndex == -1) {
+          print('행성 "${objectNameFromAI}"을(를) 찾을 수 없습니다. (AI 응답: $aiData)');
+          ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+            SnackBar(
+              content: Text('AI가 언급한 "${objectNameFromAI}" 행성을 찾을 수 없습니다.'),
+              backgroundColor: Colors.orangeAccent,
+            ),
+          );
+          return;
+        }
+
         Planet targetPlanet = planets[planetIndex];
 
-        // Calculate new values and clamp them between 0.0 and 1.0
         double newFriendliness =
             targetPlanet.friendliness + friendlinessAdjustment;
         newFriendliness = newFriendliness.clamp(0.0, 1.0);
@@ -503,38 +507,39 @@ class _SolarSystemPageState extends State<SolarSystemPage>
         double newImportance = targetPlanet.importance + importanceAdjustment;
         newImportance = newImportance.clamp(0.0, 1.0);
 
-        // Update the planet in the list
         setState(() {
           planets[planetIndex] = Planet(
             name: targetPlanet.name,
             importance: newImportance,
             friendliness: newFriendliness,
-            color: targetPlanet.color, // Keep original color
-            speed: targetPlanet.speed, // Keep original speed
+            color: targetPlanet.color,
+            speed: targetPlanet.speed,
           );
-          _sortPlanets(); // Re-sort if adjustments change their order
+          _sortPlanets();
         });
-        _savePlanets(); // Save the updated list
+        _savePlanets();
 
         print(
-            '"$objectName" 행성 업데이트 완료: 친밀도 ${newFriendliness.toStringAsFixed(2)}, 중요도 ${newImportance.toStringAsFixed(2)}');
+            '"${objectNameFromAI}" 행성 업데이트 완료: 친밀도 ${newFriendliness.toStringAsFixed(2)}, 중요도 ${newImportance.toStringAsFixed(2)}');
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
-            content: Text('"${objectName}" 행성의 정보가 AI 제안에 따라 업데이트되었습니다!'),
+            content: Text('"${objectNameFromAI}" 행성의 정보가 AI 제안에 따라 업데이트되었습니다!'),
             backgroundColor: Colors.lightBlue,
             duration: const Duration(seconds: 3),
           ),
         );
       } else {
-        // Handle non-200 responses
+        // ... (your existing error handling for non-200 responses) ...
         String errorMessage = '메시지 전송 실패: ${response.statusCode}';
         try {
           final errorData = jsonDecode(response.body);
-          errorMessage += ' - ${errorData['error'] ?? response.body}';
+          errorMessage +=
+              ' - ${errorData['error'] ?? errorData['details'] ?? response.body}';
         } catch (e) {
-          errorMessage += ' - ${response.body}';
+          errorMessage += ' - (응답 내용 확인 불가)';
         }
-        print('Error sending shout: $errorMessage');
+        print(
+            'Error sending shout: $errorMessage \nRaw Body: ${response.body}');
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
               content: Text(errorMessage), backgroundColor: Colors.redAccent),
