@@ -185,5 +185,12 @@ exports.handler = async (event, context) => {
         headers: { 'Content-Type': 'application/json; charset=utf-8' }
       };
     }
+  } catch (error) {
+    console.error('Error during OpenAI API call in Netlify function:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to process the request due to an error with the AI service.' }),
+      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    };
   }
 };
