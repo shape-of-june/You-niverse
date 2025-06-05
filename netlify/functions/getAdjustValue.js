@@ -145,7 +145,7 @@ exports.handler = async (event, context) => {
       response_format: { type: "json_object" }, // Request JSON mode if available and model supports
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: userPromptFromFrontend } // This is the user's sentence
+        { role: "user", content: userPrompt } // This is the user's sentence
       ],
       // temperature: 0.3, // You might want a lower temperature for more deterministic JSON output
     });
