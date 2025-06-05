@@ -85277,7 +85277,7 @@ if(o.b===200){i=o
 n=B.bi.z4(A.aoe(A.anf(i.e).c.a.i(0,"charset")).e1(i.w),null)
 g=J.jW(n,"reply")
 m=g==null?"\uc751\ub2f5\uc744 \ubc1b\uc9c0 \ubabb\ud588\uc2b5\ub2c8\ub2e4.":g
-A.lK("AI Reply: "+A.e(m))
+A.lK(m)
 i=b.ag(t.Pu)
 i.toString
 i.f.kE(A.AN(null,null,null,B.u1,null,B.Q,null,A.ds("AI \uc751\ub2f5: "+A.e(m),null,null,null,null,null,null),null,B.IR,null,null,null,null,null,null,null,null,null))}else{l="\uba54\uc2dc\uc9c0 \uc804\uc1a1 \uc2e4\ud328: "+o.b
