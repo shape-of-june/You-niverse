@@ -79,6 +79,111 @@ class _SolarSystemPageState extends State<SolarSystemPage>
     _sortPlanets();
   }
 
+  // Inside _SolarSystemPageState class:
+
+  void _goToNextDay() {
+    if (!mounted) return; // Ensure widget is still mounted
+
+    if (planets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('행성이 없어 다음 날로 진행할 특별한 이벤트가 없네요.')),
+      );
+      return; // No planets to update or use for messages
+    }
+
+    List<Planet> updatedPlanets = [];
+    Planet?
+        firstLowFriendlinessPlanet; // To store the first planet found with low friendliness
+
+    // Step 1: Reduce friendliness for all planets
+    for (var planet in planets) {
+      double newFriendliness = (planet.friendliness - 0.01).clamp(0.0, 1.0);
+      updatedPlanets.add(Planet(
+        name: planet.name,
+        importance: planet.importance,
+        friendliness: newFriendliness, // Updated friendliness
+        color: planet.color,
+        speed: planet.speed,
+      ));
+    }
+
+    // Update the state with new friendliness values, then sort
+    setState(() {
+      planets = updatedPlanets;
+      _sortPlanets(); // Sort based on potentially new friendliness scores
+    });
+    _savePlanets(); // Save the changes
+
+    // Step 2: Determine and show the pop-up message
+    String popupMessage = "";
+
+    // Check for Message 3 (Low Friendliness Alert - friendliness <= 30%)
+    // The 'planets' list is now updated and sorted.
+    for (var planet in planets) {
+      if (planet.friendliness <= 0.30) {
+        firstLowFriendlinessPlanet = planet;
+        break; // We only need the first one for this message type
+      }
+    }
+
+    int messageType =
+        math.Random().nextInt(3); // Generates a random integer: 0, 1, or 2
+
+    switch (messageType) {
+      case 0: // Message Type 1 (Original Message 1: Birthday reminder)
+        if (planets.isNotEmpty) {
+          Planet randomPlanet = planets[math.Random().nextInt(planets.length)];
+          popupMessage =
+              "${randomPlanet.name}님의 생일이 1주일 정도 남았습니다. 선물을 준비해 보는 게 어떨까요?";
+        } else {
+          // Fallback if Message Type 1 was chosen but no planets exist
+          popupMessage = "오늘은 주변의 소중한 사람들에게 따뜻한 관심을 표현하기 좋은 날이에요!";
+        }
+        break;
+      case 1: // Message Type 2 (Original Message 2: Parents' Day reminder)
+        if (firstLowFriendlinessPlanet != null) {
+          popupMessage =
+              "${firstLowFriendlinessPlanet.name}님의 친밀도가 ${(firstLowFriendlinessPlanet.friendliness * 100).toStringAsFixed(0)}%으로 떨어졌어요. 한번 가벼운 연락을 해보는 게 어떤가요?";
+        } else {
+          popupMessage = "오늘은 주변의 소중한 사람들에게 따뜻한 관심을 표현하기 좋은 날이에요!";
+        }
+        break;
+      case 2: // Message Type 3 (New additional random message)
+        if (planets.isNotEmpty) {
+          // Example using a random planet for a general positive message
+          Planet randomPlanet = planets[math.Random().nextInt(planets.length)];
+          popupMessage =
+              "${randomPlanet.name}님과의 소중한 추억을 떠올리며 하루를 시작해보세요. 작은 미소가 큰 행복을 가져다줄 거예요. 😊";
+        } else {
+          // Fallback if Message Type 3 was chosen but no planets exist
+          popupMessage = "새로운 하루가 밝았어요! 긍정적인 에너지로 주변을 채워보세요. ✨";
+        }
+        break;
+      default:
+        // Should not happen with nextInt(3), but as a safe default
+        popupMessage = "오늘 하루도 즐거운 일들로 가득하시길 바랍니다!";
+        break;
+      // ---- END OF MODIFIED SECTION ----
+    }
+
+    // Show the dialog with the determined message
+    if (popupMessage.isNotEmpty && mounted) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text("별똥별의 제안"),
+          content: Text(popupMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("확인"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Future<void> _savePlanets() async {
     final prefs = await SharedPreferences.getInstance();
     final planetsJson =
@@ -315,7 +420,7 @@ class _SolarSystemPageState extends State<SolarSystemPage>
             // <<< Use StatefulBuilder for loading state within dialog
             builder: (stfContext, setDialogState) {
           return AlertDialog(
-            title: const Text("오늘 인간관계에 대해 하고 싶은 말을\n 우주에 외쳐보세요!"),
+            title: const Text("오늘 인간관계에 대해 하고 싶은 말을\n우주에 외쳐보세요!"),
             content: Column(
               // <<< Wrap TextField in a Column for loading indicator
               mainAxisSize: MainAxisSize.min,
@@ -398,30 +503,6 @@ class _SolarSystemPageState extends State<SolarSystemPage>
 
   Future<void> _sendShoutToBackend(
       String message, BuildContext scaffoldContext) async {
-    // For deployed app, path is relative. For local testing with `netlify dev`
-    // use `http://localhost:YOUR_NETLIFY_DEV_PORT/.netlify/functions/chatWithGPT`
-    // Ensure `_netlifyFunctionUrl` is set correctly. If it starts with '/', it assumes same host.
-    // If you are testing locally and your Flutter app runs on a different port than netlify dev,
-    // you MUST use the full URL for local testing (e.g., http://localhost:8888/.netlify/functions/chatWithGPT).
-    // For a deployed app, "/.netlify/functions/chatWithGPT" is usually correct.
-
-    // Determine the base URL dynamically for web builds to avoid CORS issues locally
-    // String baseUrl = "https://subtle-kitsune-751533.netlify.app/";
-    // String baseUrl = "http://127.0.0.1:5500/"; // For local testing with netlify dev
-    // This kIsWeb check and Uri.base only works for web builds.
-    // For mobile, you'd need the full deployed URL.
-    // #  if (kIsWeb) {
-    // #    baseUrl = Uri.base.origin; // e.g., http://localhost:PORT or https://your-site.netlify.app
-    // #  } else {
-    // #    // For mobile, you MUST use your deployed Netlify function URL
-    // #    baseUrl = "https://your-netlify-site-name.netlify.app";
-    // #  }
-    // For simplicity, assuming relative path works for deployed web, or you hardcode for mobile.
-    // If testing flutter web locally, and netlify dev is on a different port,
-    // explicitly use: "http://localhost:8888" as baseUrl for local dev.
-    // Let's assume for web deployment the relative path is okay.
-
-    // final Uri functionUri = Uri.parse('$baseUrl.netlify/functions/getAdjustValue');
     final Uri functionUri = Uri.parse(
         _netlifyFunctionUrl); // If relative, needs base URL for non-web or local.
     // For now, let's assume it's just the path.
@@ -434,24 +515,14 @@ class _SolarSystemPageState extends State<SolarSystemPage>
       );
 
       if (response.statusCode == 200) {
-        // The http package usually decodes response.body as UTF-8 if the server sends
-        // 'Content-Type: ...; charset=utf-8'.
-        // If encoding issues persist even after fixing the Netlify function header,
-        // you might need to force decode:
-        // final String responseBody = utf8.decode(response.bodyBytes);
-        // final Map<String, dynamic> aiData = jsonDecode(responseBody);
-        // BUT try with response.body first, as it's simpler if headers are correct.
-
         final Map<String, dynamic> aiData;
         try {
           // Assuming the Netlify function now returns the AI's JSON object directly as its body
           aiData = jsonDecode(response.body) as Map<String, dynamic>;
         } catch (e) {
-          print('Error decoding JSON from Netlify function: $e');
-          print('Raw response body: ${response.body}');
           ScaffoldMessenger.of(scaffoldContext).showSnackBar(
             const SnackBar(
-              content: Text('AI로부터 받은 응답을 처리하는데 문제가 발생했습니다 (JSON 형식 오류).'),
+              content: Text('AI로부터 받은 응답을 처리하는데 문제가 발생했습니다.'),
               backgroundColor: Colors.redAccent,
             ),
           );
@@ -466,13 +537,10 @@ class _SolarSystemPageState extends State<SolarSystemPage>
             aiData['importanceAdjust']?.toString() ?? '0.0';
 
         // Log the decoded name to check if encoding is fixed
-        print('Decoded AI Object Name: $objectNameFromAI');
-        print('AI Full Response Data: $aiData');
 
         if (objectNameFromAI.isEmpty) {
-          print('AI did not specify an object name. AI Response: $aiData');
           ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('AI가 행성 이름을 명확히 응답하지 않았습니다.'),
               backgroundColor: Colors.orangeAccent,
             ),
@@ -488,10 +556,9 @@ class _SolarSystemPageState extends State<SolarSystemPage>
         int planetIndex = planets.indexWhere((p) => p.name == objectNameFromAI);
 
         if (planetIndex == -1) {
-          print('행성 "${objectNameFromAI}"을(를) 찾을 수 없습니다. (AI 응답: $aiData)');
           ScaffoldMessenger.of(scaffoldContext).showSnackBar(
             SnackBar(
-              content: Text('AI가 언급한 "${objectNameFromAI}" 행성을 찾을 수 없습니다.'),
+              content: Text('"$objectNameFromAI" 행성을 찾을 수 없습니다.'),
               backgroundColor: Colors.orangeAccent,
             ),
           );
@@ -519,11 +586,10 @@ class _SolarSystemPageState extends State<SolarSystemPage>
         });
         _savePlanets();
 
-        print(
-            '"${objectNameFromAI}" 행성 업데이트 완료: 친밀도 ${newFriendliness.toStringAsFixed(2)}, 중요도 ${newImportance.toStringAsFixed(2)}');
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
-            content: Text('"${objectNameFromAI}" 행성의 정보가 AI 제안에 따라 업데이트되었습니다!'),
+            content: Text(
+                '"$objectNameFromAI" 행성 업데이트 완료: 친밀도 ${newFriendliness.toStringAsFixed(2)}, 중요도 ${newImportance.toStringAsFixed(2)}'),
             backgroundColor: Colors.lightBlue,
             duration: const Duration(seconds: 3),
           ),
@@ -538,8 +604,6 @@ class _SolarSystemPageState extends State<SolarSystemPage>
         } catch (e) {
           errorMessage += ' - (응답 내용 확인 불가)';
         }
-        print(
-            'Error sending shout: $errorMessage \nRaw Body: ${response.body}');
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
               content: Text(errorMessage), backgroundColor: Colors.redAccent),
@@ -547,7 +611,6 @@ class _SolarSystemPageState extends State<SolarSystemPage>
       }
     } catch (e) {
       // Handle network errors or other exceptions
-      print('Exception sending shout: $e');
       ScaffoldMessenger.of(scaffoldContext).showSnackBar(
         SnackBar(
             content: Text('메시지 전송 중 오류 발생: $e'), backgroundColor: Colors.red),
@@ -568,8 +631,18 @@ class _SolarSystemPageState extends State<SolarSystemPage>
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('당신의 우주', style: TextStyle(color: Colors.white)),
+        title: const Text('You-niverse', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.wb_sunny, // This is the filled version
+              color: Colors.amber, // Optionally, still apply a bright color
+            ),
+            tooltip: '다음 날',
+            onPressed: _goToNextDay,
+          )
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
