@@ -689,7 +689,7 @@ class _SolarSystemPageState extends State<SolarSystemPage>
                     decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: ClipOval(
                       child: SvgPicture.asset(
-                        'assets/kakao.svg', // Ensure this is in assets/ and pubspec.yaml
+                        'kakao.svg', // Ensure this is in assets/ and pubspec.yaml
                         fit: BoxFit.cover,
                         placeholderBuilder: (BuildContext context) =>
                             const Icon(Icons.chat,

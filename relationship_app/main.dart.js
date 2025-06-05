@@ -85368,7 +85368,7 @@ if(q.f)s=B.Cr
 else{s=q.d
 s===$&&A.a()
 s=A.fI(s,new A.alv(q),p)}r=A.a1V(p,B.JY,"shout_to_universe_button",!1,q.gaeT(),"\uc6b0\uc8fc\uc5d0 \uc678\uce58\uae30")
-o=A.Mp(A.b([new A.cm(B.J9,r,p),A.r0(A.b([A.a1V(B.Hq,A.fJ(p,new A.Hu(new A.Nu(B.B9,new A.B0("assets/kakao.svg",p,p,p,p),new A.alw(),p,p),p),B.t,p,p,B.B7,40,p,p,40),"kakao_sync",!1,q.gaeR(),p),B.eK,A.a1V(p,B.K_,"add_planet",!1,q.ga3r(),p)],o),B.bN,B.fZ,B.bS)],o),B.mY,B.tR,B.h_)
+o=A.Mp(A.b([new A.cm(B.J9,r,p),A.r0(A.b([A.a1V(B.Hq,A.fJ(p,new A.Hu(new A.Nu(B.B9,new A.B0("kakao.svg",p,p,p,p),new A.alw(),p,p),p),B.t,p,p,B.B7,40,p,p,40),"kakao_sync",!1,q.gaeR(),p),B.eK,A.a1V(p,B.K_,"add_planet",!1,q.ga3r(),p)],o),B.bN,B.fZ,B.bS)],o),B.mY,B.tR,B.h_)
 r=q.e.length
 return new A.A7(new A.vZ(B.Z3,n,B.l,!0,new A.SV(p,p,1/0,56),p),s,new A.cm(B.aX,o,p),B.l,A.fJ(p,r===0?B.Cs:A.avs(new A.alx(q),r,B.iU,B.at),B.t,B.l,p,p,120,p,p,p),p)}}
 A.alc.prototype={
