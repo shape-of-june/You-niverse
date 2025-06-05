@@ -299,7 +299,7 @@ class _SolarSystemPageState extends State<SolarSystemPage>
     _savePlanets();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('카카오톡 친구 50명이 성공적으로 연동되었습니다!'),
+          content: Text('카카오톡 친구 792명이 성공적으로 연동되었습니다!'),
           backgroundColor: Colors.green),
     );
   }
@@ -589,7 +589,7 @@ class _SolarSystemPageState extends State<SolarSystemPage>
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
             content: Text(
-                '"$objectNameFromAI" 행성 업데이트 완료: 친밀도 ${newFriendliness.toStringAsFixed(2)}, 중요도 ${newImportance.toStringAsFixed(2)}'),
+                '"$objectNameFromAI" 행성 업데이트 완료: 친밀도 ${friendlinessAdjustment*100}%, 중요도 ${importanceAdjustment*100}%'),
             backgroundColor: Colors.lightBlue,
             duration: const Duration(seconds: 3),
           ),
