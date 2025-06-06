@@ -85267,7 +85267,7 @@ for(s=1;s<=45;++s){r=B.bL.kl()
 q=B.bL.kl()
 p=m[B.bL.Ab(15)]
 o=B.bL.kl()
-l.push(new A.dW("\uce5c\uad6c"+s,0.2+r*0.5,0.2+q*0.5,p,0.3+o*1.7))}n.ae(new A.akT(n,l))
+l.push(new A.dW("\uc0ac\ub78c"+s,0.2+r*0.5,0.2+q*0.5,p,0.3+o*1.7))}n.ae(new A.akT(n,l))
 n.j5()
 r=n.c.ab(t.R)
 r.toString
@@ -85285,21 +85285,21 @@ aeU(){var s=new A.Bf(B.zd,$.as()),r=this.c
 r.toString
 A.Xt(new A.alq(this,s,r),r,t.z).bP(new A.alr(this,s),t.P)},
 xL(a,b){return this.aer(a,b)},
-aer(b2,b3){var s=0,r=A.T(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1
-var $async$xL=A.U(function(b5,b6){if(b5===1){o=b6
-s=p}while(true)switch(s){case 0:a9={}
-b0=A.hP("https://subtle-kitsune-751533.netlify.app/.netlify/functions/getAdjustValue")
+aer(b3,b4){var s=0,r=A.T(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2
+var $async$xL=A.U(function(b6,b7){if(b6===1){o=b7
+s=p}while(true)switch(s){case 0:b0={}
+b1=A.hP("https://subtle-kitsune-751533.netlify.app/.netlify/functions/getAdjustValue")
 p=4
 a=t.N
 a0=A.aF(["Content-Type","application/json"],a,a)
 s=7
-return A.a_(A.aPz(b0,B.bj.Ha(A.aF(["prompt",b2],a,a),null),a0),$async$xL)
-case 7:m=b6
+return A.a_(A.aPz(b1,B.bj.Ha(A.aF(["prompt",b3],a,a),null),a0),$async$xL)
+case 7:m=b7
 if(m.b===200){l=null
 try{a=m
-l=t.a.a(B.bj.z4(A.asf(A.arK(a.e).c.a.i(0,"charset")).eg(a.w),null))}catch(b4){a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(B.Td)
+l=t.a.a(B.bj.z4(A.asf(A.arK(a.e).c.a.i(0,"charset")).eg(a.w),null))}catch(b5){b0=b4.ab(t.R)
+b0.toString
+b0.f.hy(B.Td)
 s=1
 break}a=J.hl(l,"object")
 a2=a==null?null:J.dO(a)
@@ -85310,48 +85310,51 @@ j=a3==null?"0.0":a3
 a=J.hl(l,"importanceAdjust")
 a4=a==null?null:J.dO(a)
 i=a4==null?"0.0":a4
-if(J.cO(k)===0){a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(B.Ta)
+if(J.cO(k)===0){b0=b4.ab(t.R)
+b0.toString
+b0.f.hy(B.Ta)
 s=1
 break}a5=A.t7(j)
 h=a5==null?0:a5
 a6=A.t7(i)
 g=a6==null?0:a6
 f=B.b.HJ(n.e,new A.alf(k))
-if(J.c(f,-1)){a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(A.tI(null,null,null,B.h2,null,B.I,null,A.db('"'+A.e(k)+'" \ud589\uc131\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.',null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))
+if(J.c(f,-1)){b0=b4.ab(t.R)
+b0.toString
+b0.f.hy(A.tI(null,null,null,B.h2,null,B.I,null,A.db('"'+A.e(k)+'" \ud589\uc131\uc744 \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.',null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))
 s=1
 break}e=n.e[f]
 a7=e.c+h
-a9.a=a7
-a9.a=B.d.eK(a7,0,1)
+b0.a=a7
+b0.a=B.d.eK(a7,0,1)
 a8=e.b+g
-a9.b=a8
-a9.b=B.d.eK(a8,0,1)
-n.ae(new A.alg(a9,n,f,e))
+b0.b=a8
+b0.b=B.d.eK(a8,0,1)
+n.ae(new A.alg(b0,n,f,e))
 n.j5()
-a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(A.tI(null,null,null,B.u2,null,B.I,null,A.db('"'+A.e(k)+'" \ud589\uc131 \uc5c5\ub370\uc774\ud2b8 \uc644\ub8cc: \uce5c\ubc00\ub3c4 '+A.e(h*100)+"%, \uc911\uc694\ub3c4 "+A.e(g*100)+"%",null,null,null,null,null,null),null,B.n7,null,null,null,null,null,null,null,null,null))}else{d="\uba54\uc2dc\uc9c0 \uc804\uc1a1 \uc2e4\ud328: "+m.b
-try{a9=m
-c=B.bj.z4(A.asf(A.arK(a9.e).c.a.i(0,"charset")).eg(a9.w),null)
-a9=d
+b0=b4.ab(t.R)
+b0.toString
+a=A.e(k)
+a0=h>0?"+":""
+a9=g>0?"+":""
+b0.f.hy(A.tI(null,null,null,B.u2,null,B.I,null,A.db('"'+a+'" \ud589\uc131 \uc5c5\ub370\uc774\ud2b8 \uc644\ub8cc: \uce5c\ubc00\ub3c4 '+a0+" "+A.e(h*100)+"%, \uc911\uc694\ub3c4 "+a9+" "+A.e(g*100)+"%",null,null,null,null,null,null),null,B.n7,null,null,null,null,null,null,null,null,null))}else{d="\uba54\uc2dc\uc9c0 \uc804\uc1a1 \uc2e4\ud328: "+m.b
+try{b0=m
+c=B.bj.z4(A.asf(A.arK(b0.e).c.a.i(0,"charset")).eg(b0.w),null)
+b0=d
 a=J.hl(c,"error")
 if(a==null)a=J.hl(c,"details")
 if(a==null){a=m
-a=A.asf(A.arK(a.e).c.a.i(0,"charset")).eg(a.w)}d=J.apg(a9," - "+A.e(a))}catch(b4){d=J.apg(d," - (\uc751\ub2f5 \ub0b4\uc6a9 \ud655\uc778 \ubd88\uac00)")}a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(A.tI(null,null,null,B.u_,null,B.I,null,A.db(d,null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))}p=2
+a=A.asf(A.arK(a.e).c.a.i(0,"charset")).eg(a.w)}d=J.apg(b0," - "+A.e(a))}catch(b5){d=J.apg(d," - (\uc751\ub2f5 \ub0b4\uc6a9 \ud655\uc778 \ubd88\uac00)")}b0=b4.ab(t.R)
+b0.toString
+b0.f.hy(A.tI(null,null,null,B.u_,null,B.I,null,A.db(d,null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))}p=2
 s=6
 break
 case 4:p=3
-b1=o
-b=A.ap(b1)
-a9=b3.ab(t.R)
-a9.toString
-a9.f.hy(A.tI(null,null,null,B.cD,null,B.I,null,A.db("\uba54\uc2dc\uc9c0 \uc804\uc1a1 \uc911 \uc624\ub958 \ubc1c\uc0dd: "+A.e(b),null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))
+b2=o
+b=A.ap(b2)
+b0=b4.ab(t.R)
+b0.toString
+b0.f.hy(A.tI(null,null,null,B.cD,null,B.I,null,A.db("\uba54\uc2dc\uc9c0 \uc804\uc1a1 \uc911 \uc624\ub958 \ubc1c\uc0dd: "+A.e(b),null,null,null,null,null,null),null,B.b5,null,null,null,null,null,null,null,null,null))
 s=6
 break
 case 3:s=2
@@ -85421,7 +85424,7 @@ B.b.E(s.e,this.b)
 s.m0()},
 $S:0}
 A.akS.prototype={
-$1(a){return B.c.bx(a.a,"\uce5c\uad6c")},
+$1(a){return B.c.bx(a.a,"\uc0ac\ub78c")},
 $S:43}
 A.akX.prototype={
 $1(a){var s=this.a
